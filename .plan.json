@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "language": "de",
+  "understanding": {
+    "summary": "Eine Verwaltung für einen kleinen Fahrradverleih: Kunden, Fahrräder und Ausleihen mit Rückgabe und Rechnungsbetrag. Die gewünschte SMS an Kunden kann die Plattform nicht versenden.",
+    "roles": [
+      "Inhaber",
+      "Mitarbeiter am Tresen"
+    ],
+    "main_tasks": [
+      "Ausleihe erfassen",
+      "Rückgabe buchen und Rechnungsbetrag berechnen",
+      "Kunden und Fahrräder pflegen",
+      "Verfügbare Fahrräder im Blick behalten"
+    ],
+    "platform_roles": [
+      {
+        "persona": "Inhaber",
+        "role": "administrator",
+        "apps": [
+          "kunden",
+          "fahrraeder",
+          "ausleihen"
+        ]
+      },
+      {
+        "persona": "Mitarbeiter am Tresen",
+        "role": "datenverarbeitung",
+        "apps": [
+          "kunden",
+          "fahrraeder",
+          "ausleihen"
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "slug": "ausleihe-erfassen",
+      "label": {
+        "de": "Ausleihe erfassen",
+        "en": "Record rental"
+      },
+      "description": "Ein verfügbares Fahrrad für einen Kunden ausleihen. Das Fahrrad wird als nicht verfügbar markiert.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "ausleihen",
+          "op": "create",
+          "when": "always",
+          "fields": {
+            "kunde": "picked",
+            "fahrrad": "picked",
+            "ausleihzeitpunkt": "derived:now",
+            "status": "fixed:ausgeliehen",
+            "bemerkung": "user",
+            "rueckgabezeitpunkt": "user"
+          },
+          "needs": {}
+        },
+        {
+          "entity": "fahrraeder",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "verfuegbar": "fixed:false"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [
+        "ausleihen.ausleihzeitpunkt",
+        "ausleihen.fahrrad",
+        "ausleihen.rueckgabezeitpunkt"
+      ],
+      "brief": "# Flow `ausleihe-erfassen` — Ausleihe erfassen\nEin verfügbares Fahrrad für einen Kunden ausleihen. Das Fahrrad wird als nicht verfügbar markiert.\n\n## Your hook — import it, never rebuild what it owns\n`import { useAusleiheErfassenFlow } from '@/lib/journey/flows/AusleiheErfassen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick: kunde, fahrrad), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `fahrraeder`: `{...flow.picks.fahrraeder.select} {...flow.pick('fahrraeder')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Kunden auswählen\n2. Verfügbares Fahrrad auswählen\n3. Ausleihzeitpunkt bestätigen und speichern\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- creates `ausleihen`:\n    - `kunde`: from the record the user picks in this flow\n    - `fahrrad`: from the record the user picks in this flow — **REQUIRED in this flow** (mark it required and validate it before the step advances, whatever the app's base view says): intent `rueckgabe-buchen` → `rechnungsbetrag` cannot be built without it\n    - `ausleihzeitpunkt`: derived: now() — set it in the plan step, never ask — **REQUIRED in this flow** (mark it required and validate it before the step advances, whatever the app's base view says): intent `rueckgabe-buchen` → `rechnungsbetrag` cannot be built without it\n    - `status`: fixed value `ausgeliehen` — set it in the plan step's values, never ask\n    - `bemerkung`: the user enters it (bind it through the layer: form.field/…)\n    - `rueckgabezeitpunkt`: the user enters it (bind it through the layer: form.field/…) — **REQUIRED in this flow** (mark it required and validate it before the step advances, whatever the app's base view says): intent `rueckgabe-buchen` → `rechnungsbetrag` cannot be built without it\n- updates `fahrraeder`:\n    - `verfuegbar`: fixed value `false` — set it in the plan step's values, never ask\n\n## Reads\n- `kunden` columns kunde_vorname, kunde_nachname, handynummer\n- `fahrraeder` columns bezeichnung, fahrradtyp, rahmengroesse, tagespreis\n\n## Checks BEFORE the write (block the submit with the message when they fail)\n- custom (entity=`fahrraeder.verfuegbar`, rule=`Das gewählte Fahrrad muss derzeit verfügbar sein`) — message: „Dieses Fahrrad ist derzeit nicht verfügbar.“\n\n## Success page\n- shows: `ausleihen.kunde`, `ausleihen.fahrrad`, `ausleihen.ausleihzeitpunkt`\n- next flows to offer: `rueckgabe-buchen`\n\n## Never write these — another flow or a tool owns them\n- `ausleihen.rechnungsbetrag` (owner: intent `rueckgabe-buchen`)\n- `fahrraeder.zustand` (owner: intent `rueckgabe-buchen`)\n"
+    },
+    {
+      "slug": "rueckgabe-buchen",
+      "label": {
+        "de": "Rückgabe buchen",
+        "en": "Book return"
+      },
+      "description": "Eine offene Ausleihe als zurückgegeben buchen, Rechnungsbetrag aus Tagespreis und Leihdauer berechnen und das Fahrrad wieder freigeben.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "ausleihen",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "rueckgabezeitpunkt": "derived:now",
+            "status": "fixed:zurueckgegeben",
+            "rechnungsbetrag": "derived:computed:Tagespreis des Fahrrads mal angefangene Leihtage zwischen Ausleihzeitpunkt und Rückgabezeitpunkt",
+            "bemerkung": "user"
+          },
+          "needs": {
+            "rechnungsbetrag": [
+              "ausleihzeitpunkt",
+              "rueckgabezeitpunkt",
+              "fahrrad"
+            ]
+          }
+        },
+        {
+          "entity": "fahrraeder",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "verfuegbar": "fixed:true",
+            "zustand": "user"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `rueckgabe-buchen` — Rückgabe buchen\nEine offene Ausleihe als zurückgegeben buchen, Rechnungsbetrag aus Tagespreis und Leihdauer berechnen und das Fahrrad wieder freigeben.\n\n## Your hook — import it, never rebuild what it owns\n`import { useRueckgabeBuchenFlow } from '@/lib/journey/flows/RueckgabeBuchen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`, and `compute` — REQUIRED, the plan leaves these rules to you: rechnungsbetrag. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `ausleihen`: `{...flow.picks.ausleihen.select} {...flow.pick('ausleihen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. This flow CHANGES a record of `fahrraeder`: `{...flow.picks.fahrraeder.select} {...flow.pick('fahrraeder')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Offene Ausleihe auswählen\n2. Rückgabezeitpunkt bestätigen\n3. Rechnungsbetrag prüfen und buchen\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `ausleihen`:\n    - `rueckgabezeitpunkt`: derived: now() — set it in the plan step, never ask — **REQUIRED in this flow** (mark it required and validate it before the step advances, whatever the app's base view says): intent `rueckgabe-buchen` → `rechnungsbetrag` cannot be built without it\n    - `status`: fixed value `zurueckgegeben` — set it in the plan step's values, never ask\n    - `rechnungsbetrag`: derived (computed)\n    - `bemerkung`: the user enters it (bind it through the layer: form.field/…)\n- updates `fahrraeder`:\n    - `verfuegbar`: fixed value `true` — set it in the plan step's values, never ask\n    - `zustand`: the user enters it (bind it through the layer: form.field/…)\n\n## Reads\n- `ausleihen` columns kunde, fahrrad, ausleihzeitpunkt, status\n\n## Checks BEFORE the write (block the submit with the message when they fail)\n- required_context (field=`ausleihen.ausleihzeitpunkt`, rule=`Die Ausleihe muss den Status ausgeliehen haben`) — message: „Diese Ausleihe ist bereits zurückgegeben.“\n\n## Success page\n- shows: `ausleihen.rechnungsbetrag`, `ausleihen.rueckgabezeitpunkt`\n- next flows to offer: `ausleihe-erfassen`\n\n## Never write these — another flow or a tool owns them\n- `ausleihen.kunde` (owner: intent `ausleihe-erfassen`)\n- `ausleihen.fahrrad` (owner: intent `ausleihe-erfassen`)\n- `ausleihen.ausleihzeitpunkt` (owner: intent `ausleihe-erfassen`)\n"
+    }
+  ],
+  "public_pages": [],
+  "tools": [],
+  "covered_by_platform": [
+    {
+      "wish": "Übersicht aller Kunden, Räder und Ausleihen",
+      "feature": "list_page"
+    },
+    {
+      "wish": "Ausleihen pro Status oder Kunde zählen",
+      "feature": "distribution_view"
+    },
+    {
+      "wish": "Zugriff für Mitarbeiter regeln",
+      "feature": "user_roles"
+    }
+  ],
+  "ownership": {
+    "ausleihen": {
+      "kunde": "intent:ausleihe-erfassen",
+      "fahrrad": "intent:ausleihe-erfassen",
+      "ausleihzeitpunkt": "intent:ausleihe-erfassen",
+      "status": "intent:rueckgabe-buchen",
+      "bemerkung": "intent:rueckgabe-buchen",
+      "rueckgabezeitpunkt": "intent:rueckgabe-buchen",
+      "rechnungsbetrag": "intent:rueckgabe-buchen"
+    },
+    "fahrraeder": {
+      "verfuegbar": "intent:rueckgabe-buchen",
+      "zustand": "intent:rueckgabe-buchen"
+    }
+  },
+  "dashboard": {
+    "focus": [
+      "Aktuell ausgeliehene Fahrräder",
+      "Verfügbare Fahrräder",
+      "Heutige Rückgaben",
+      "Offene Ausleihen ohne Rückgabe"
+    ],
+    "hints": [
+      "Der SMS-Versand an Kunden ist mit der Plattform nicht möglich",
+      "Rechnungsbetrag lässt sich aus Tagespreis und Leihdauer berechnen"
+    ],
+    "wishes": []
+  }
+}

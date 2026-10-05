@@ -1,0 +1,31 @@
+{
+  "entities": {
+    "Kunden": {
+      "placeholders_set": 7,
+      "defaults_keys": [],
+      "computed_keys": [],
+      "reason": "Kunden sind reine Stammdaten ohne numerische Felder oder Datumspaare, daher keine Formeln und keine Defaults."
+    },
+    "Fahrräder": {
+      "placeholders_set": 5,
+      "defaults_keys": [
+        "verfuegbar",
+        "zustand"
+      ],
+      "computed_keys": [],
+      "reason": "Reine Stammdaten ohne Datumspaare oder Mengen, daher keine Formel möglich."
+    },
+    "Ausleihen": {
+      "placeholders_set": 6,
+      "defaults_keys": [
+        "ausleihzeitpunkt",
+        "status"
+      ],
+      "computed_keys": [
+        "rechnungsbetrag",
+        "_ausleihe_dauer_tage"
+      ],
+      "reason": "Rechnungsbetrag ist Leihdauer in Tagen mal Tagespreis des Fahrrads, zusätzlich eine virtuelle Dauer für die Zusammenfassung."
+    }
+  }
+}
