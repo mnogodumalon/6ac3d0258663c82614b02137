@@ -14,6 +14,9 @@ import { IntentPolicyLoader } from '@/components/IntentPolicyLoader';
 import IntentsAdmin from '@/pages/IntentsAdmin';
 import AppMap from '@/pages/AppMap';
 // <custom:imports>
+const IntentFahrradAusleihenPage = lazy(() => import('@/pages/intents/FahrradAusleihenPage'));
+import { DashboardSkeleton } from '@/components/DashboardStates';
+const IntentFahrradZuruecknehmenPage = lazy(() => import('@/pages/intents/FahrradZuruecknehmenPage'));
 // </custom:imports>
 
 // Lazy: public pages live outside <Layout> and only load on /#/public/:slug —
@@ -85,6 +88,8 @@ export default function App() {
                 <Route path="verwaltung/oeffentliche-seiten" element={<PublicPagesAdmin />} />
                 <Route path="verwaltung/oeffentliche-seiten/:slug/felder" element={<PublicPageFields />} />
                 {/* <custom:routes> */}
+                <Route path="intents/fahrrad-ausleihen" element={<Suspense fallback={<DashboardSkeleton />}><IntentFahrradAusleihenPage /></Suspense>} />
+                <Route path="intents/fahrrad-zuruecknehmen" element={<Suspense fallback={<DashboardSkeleton />}><IntentFahrradZuruecknehmenPage /></Suspense>} />
                 {/* </custom:routes> */}
                 {/* An unknown hash (a bookmark from before a rebuild renamed the
                     flows, a mistyped link) must not be a blank page. */}

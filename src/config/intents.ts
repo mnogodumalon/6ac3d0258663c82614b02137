@@ -20,6 +20,7 @@
 import type { ComponentType } from 'react';
 
 // <custom:intent-imports>
+import { IconBike, IconArrowBackUp } from '@tabler/icons-react';
 // </custom:intent-imports>
 
 export interface IntentLink {
@@ -42,6 +43,8 @@ export interface IntentLink {
 
 export const INTENTS: IntentLink[] = [
   // <custom:intents>
+  { path: '/intents/fahrrad-ausleihen', label: { de: 'Fahrrad ausleihen', en: 'Lend out a bike' }, icon: IconBike, description: 'Kunde und freies Fahrrad auswählen, Ausleihe starten und das Rad als nicht verfügbar markieren.' },
+  { path: '/intents/fahrrad-zuruecknehmen', label: { de: 'Fahrrad zurücknehmen', en: 'Take a bike back' }, icon: IconArrowBackUp, description: 'Offene Ausleihe wählen, Rückgabe erfassen, Rechnungsbetrag aus Tagespreis und Dauer berechnen und das Rad wieder freigeben.' },
   // </custom:intents>
 ];
 
@@ -52,7 +55,7 @@ export const INTENTS: IntentLink[] = [
  * purpose — a scaffold update resets it to false (self-healing if Phase 2
  * never ran).
  */
-export const INTENTS_PENDING = true;
+export const INTENTS_PENDING = false;
 
 /**
  * When the Phase-1 bundle was deployed (ISO, set by the service together with
