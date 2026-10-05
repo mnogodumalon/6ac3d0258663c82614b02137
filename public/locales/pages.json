@@ -1,0 +1,31 @@
+{
+  "pages": {
+    "en": {
+      "Alle Räder sind da, zum Beispiel {0} warten auf Kundschaft.": "All bikes are here, for example {0} waiting for customers.",
+      "Alle Räder sind fahrbereit.": "All bikes are ready to ride.",
+      "Am längsten unterwegs": "Out the longest",
+      "Eine Rückgabe lässt sich nicht per Ziehen zurücknehmen — bitte im Detail bearbeiten.": "A return can't be undone by dragging — please edit it in the details.",
+      "Erstes Fahrrad aufnehmen": "Add first bike",
+      "Heute erwartet: {0} bringen ihr Rad zurück.": "Expected today: {0} returning their bike.",
+      "Heute fällig": "Due today",
+      "Kein Rad unterwegs — alle sind zurück.": "No bikes out — all are back.",
+      "Neue Ausleihe": "New rental",
+      "Noch keine Räder im Verleih.": "No bikes in the rental fleet yet.",
+      "Reparaturbedürftig": "Needs repair",
+      "Repariert": "Repaired",
+      "Richte deinen Verleih ein: lege dein erstes Fahrrad an.": "Set up your rental: add your first bike.",
+      "Umsatz": "Revenue",
+      "Unterwegs sind {0} — heute ist keine Rückgabe fällig.": "{0} out on rental — no returns due today.",
+      "Verfügbar": "Available",
+      "Zurücknehmen": "Check in",
+      "Zurücknehmen & abrechnen": "Check in & bill",
+      "seit {0}": "since {0}",
+      "zurück bis {0}": "back by {0}",
+      "{0} {1} das Rad noch nicht zurückgebracht.": "{0} {1} not yet returned the bike.",
+      "{0} — als repariert markiert": "{0} — marked as repaired",
+      "{0} — zurückgenommen, Rechnungsbetrag {1}": "{0} — checked in, invoice amount {1}",
+      "überfällig — {0} sollte am {1} zurück sein.": "overdue — {0} was due back on {1}."
+    }
+  },
+  "v": 1
+}

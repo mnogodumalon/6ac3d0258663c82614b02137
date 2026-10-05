@@ -1,0 +1,26 @@
+{
+  "KundenDialog.tsx": {
+    "kunde_vorname": "z. B. Anna",
+    "kunde_nachname": "z. B. Müller",
+    "email": "z. B. anna.mueller@beispiel.de",
+    "strasse": "z. B. Hauptstraße",
+    "hausnummer": "z. B. 12a",
+    "plz": "z. B. 10115",
+    "ort": "z. B. Berlin"
+  },
+  "FahrraederDialog.tsx": {
+    "bezeichnung": "z. B. Trekkingrad Herren 28 Zoll",
+    "marke": "z. B. Cube, Trek",
+    "rahmengroesse": "z. B. 52 cm, M",
+    "farbe": "z. B. Schwarz matt",
+    "tagespreis": "z. B. 15"
+  },
+  "AusleihenDialog.tsx": {
+    "kunde": "Welcher Kunde?",
+    "fahrrad": "Welches Fahrrad?",
+    "ausleihzeitpunkt": "Wann wird ausgeliehen?",
+    "rueckgabezeitpunkt": "Wann kommt es zurück?",
+    "rechnungsbetrag": "z. B. 45,00",
+    "bemerkung": "Besonderheiten zur Ausleihe"
+  }
+}
